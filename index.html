@@ -6,6 +6,8 @@
   <title>CK AI Prediction | Premium</title>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <style>
     :root {
       --bg: #0f172a;
@@ -39,7 +41,8 @@
       padding: 1rem;
     }
     
-    .card {
+    /* Login Panel Styles */
+    .login-panel {
       background: var(--card-bg);
       border-radius: var(--radius);
       padding: 2.5rem;
@@ -54,14 +57,7 @@
       animation: cardEnter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
     }
     
-    @keyframes cardEnter {
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-    
-    .card::before {
+    .login-panel::before {
       content: '';
       position: absolute;
       top: 0;
@@ -139,7 +135,163 @@
       text-align: center;
     }
     
-    /* New Period Box Design */
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+    
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+    
+    input {
+      width: 100%;
+      padding: 1rem;
+      background: rgba(15, 23, 39, 0.6);
+      border: 1px solid var(--glass);
+      border-radius: var(--radius);
+      font-size: 1rem;
+      color: var(--fg);
+      transition: all 0.2s;
+      font-family: 'Manrope', sans-serif;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    button {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      font-family: 'Manrope', sans-serif;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    #timer {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: var(--accent);
+      padding: 1rem;
+      background: rgba(15, 23, 39, 0.6);
+      border-radius: var(--radius);
+      border: 1px solid var(--glass);
+    }
+    
+    #content {
+      display: none;
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: rgba(15, 23, 39, 0.6);
+      border-radius: var(--radius);
+      text-align: center;
+      border: 1px solid var(--glass);
+      animation: contentFade 0.5s ease-out;
+    }
+    
+    @keyframes contentFade {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .success-icon {
+      color: #10b981;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .success-text {
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      color: var(--fg);
+    }
+    
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      opacity: 0.7;
+      text-align: center;
+      position: relative;
+    }
+    
+    .footer::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    
+    /* AI Prediction Card Styles */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--glass);
+      position: relative;
+      overflow: hidden;
+      display: none;
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        135deg,
+        rgba(59, 130, 246, 0.1),
+        rgba(99, 102, 241, 0.1)
+      );
+      z-index: -1;
+    }
+    
+    @keyframes cardEnter {
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    /* Period Box Design */
     .period-box {
       background: rgba(15, 23, 39, 0.6);
       padding: 1rem;
@@ -293,25 +445,6 @@
       box-shadow: 0 0 10px var(--small);
     }
     
-    .credit-footer {
-      margin-top: 2rem;
-      font-size: 0.75rem;
-      opacity: 0.7;
-      text-align: center;
-      position: relative;
-    }
-    
-    .credit-footer::after {
-      content: '';
-      position: absolute;
-      top: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 50%;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    }
-    
     /* Result change animation */
     @keyframes flipIn {
       0% { transform: rotateX(90deg); opacity: 0; }
@@ -324,7 +457,7 @@
     
     /* Responsive adjustments */
     @media (max-width: 480px) {
-      .card {
+      .login-panel, .card {
         padding: 1.75rem;
       }
       
@@ -351,7 +484,46 @@
   </style>
 </head>
 <body>
-  <div class="card">
+  <!-- Login Panel -->
+  <div class="login-panel" id="loginPanel">
+    <div class="premium-badge">
+      <i class="fas fa-crown"></i> PREMIUM ACCESS
+    </div>
+    
+    <div class="logo">
+      <div class="logo-icon">
+        <i class="fas fa-robot"></i>
+      </div>
+      <h1 class="title">Lottery Tricks Ai Predition</h1>
+      <div class="subtitle">Premium Access Required</div>
+    </div>
+    
+    <div class="form-group">
+      <label for="keyInput">ACCESS KEY</label>
+      <input type="text" id="keyInput" placeholder="Enter your premium access key">
+    </div>
+    
+    <button onclick="activateKey()">
+      <i class="fas fa-key"></i> ACTIVATE ACCESS
+    </button>
+    
+    <div id="timer"></div>
+    
+    <div id="content">
+      <div class="success-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="success-text">PREMIUM ACCESS GRANTED!</div>
+      <button onclick="showPredictionPage()" style="background: linear-gradient(135deg, #10b981, #059669);">
+        <i class="fas fa-chart-line"></i> LAUNCH AI PREDICTION
+      </button>
+    </div>
+    
+    <div class="footer">CREDITS BY PYAUNGGYI</div>
+  </div>
+
+  <!-- AI Prediction Card -->
+  <div class="card" id="predictionCard">
     <div class="premium-badge">
       <i class="fas fa-crown"></i> PREMIUM MEMBER
     </div>
@@ -360,12 +532,12 @@
       <div class="logo-icon">
         <i class="fas fa-robot"></i>
       </div>
-      <h1 class="title">CK AI PREDICTION</h1>
+      <h1 class="title">Lottery Tricks Ai Predition</h1>
       <div class="subtitle">30 Second Interval Analysis</div>
     </div>
     
     <div id="ai-content">
-      <!-- New Period Box -->
+      <!-- Period Box -->
       <div class="period-box">
         <div class="period-label">Current Period</div>
         <div class="period-value" id="period">--------</div>
@@ -378,7 +550,7 @@
         </div>
       </div>
       
-      <!-- Improved Results Display -->
+      <!-- Results Display -->
       <div class="prediction-container">
         <div class="prediction-label">AI Prediction</div>
         <div class="result" id="result">--</div>
@@ -396,96 +568,209 @@
       </div>
     </div>
     
-    <div class="credit-footer">CRD BY PYAUNGGYI</div>
+    <div class="footer">CRD BY PYAUNGGYI</div>
   </div>
 
   <script>
-    const patternString = `BIG SMALL SMALL BIG BIG SMALL SMALL BIG BIG SMALL SMALL BIG BIG BIG SMALL SMALL BIG SMALL BIG SMALL SMALL BIG BIG SMALL BIG SMALL SMALL SMALL SMALL BIG SMALL BIG SMALL SMALL SMALL SMALL BIG SMALL BIG BIG SMALL BIG SMALL BIG BIG BIG SMALL SMALL BIG SMALL BIG SMALL SMALL BIG SMALL BIG BIG BIG BIG SMALL BIG SMALL SMALL SMALL SMALL BIG SMALL SMALL BIG SMALL SMALL SMALL BIG BIG SMALL SMALL SMALL SMALL BIG SMALL BIG SMALL BIG SMALL SMALL SMALL BIG BIG SMALL SMALL BIG SMALL BIG BIG SMALL SMALL BIG BIG SMALL BIG BIG SMALL SMALL SMALL SMALL BIG BIG SMALL BIG SMALL SMALL BIG SMALL BIG BIG BIG SMALL SMALL BIG SMALL SMALL BIG SMALL SMALL SMALL BIG SMALL SMALL BIG SMALL SMALL SMALL SMALL BIG BIG SMALL SMALL BIG BIG SMALL SMALL BIG SMALL SMALL BIG SMALL SMALL SMALL BIG BIG BIG SMALL BIG BIG SMALL SMALL SMALL SMALL BIG SMALL SMALL BIG BIG BIG SMALL SMALL SMALL BIG SMALL SMALL SMALL SMALL BIG SMALL SMALL SMALL BIG SMALL BIG BIG SMALL SMALL BIG SMALL BIG SMALL SMALL BIG BIG SMALL BIG SMALL SMALL SMALL SMALL SMALL SMALL BIG SMALL SMALL SMALL BIG SMALL SMALL BIG BIG SMALL SMALL SMALL BIG SMALL SMALL SMALL BIG BIG SMALL SMALL SMALL SMALL SMALL BIG SMALL BIG SMALL BIG SMALL BIG BIG SMALL BIG SMALL SMALL SMALL BIG SMALL SMALL SMALL SMALL SMALL BIG BIG SMALL SMALL BIG SMALL SMALL SMALL BIG SMALL SMALL BIG SMALL BIG BIG BIG SMALL SMALL BIG SMALL BIG SMALL BIG SMALL BIG SMALL SMALL SMALL SMALL BIG SMALL BIG SMALL BIG BIG SMALL SMALL BIG SMALL SMALL`;
-    const results = patternString.split(" ");
-    let lastPeriodIndex = -1;
-    let lastResult = null;
-
-    const pad = (n, w = 2) => String(n).padStart(w, '0');
-    
-    const getMMTime = () => {
-      const now = new Date();
-      const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-      return new Date(utc + 6.5 * 60 * 60 * 1000); // UTC+6:30 for Myanmar
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAy3QvFmhKiOX38MZiINfZq2yYXGhb7uL8",
+      authDomain: "ck-adm.firebaseapp.com",
+      databaseURL: "https://ck-adm-default-rtdb.europe-west1.firebasedatabase.app/",
+      projectId: "ck-adm",
+      storageBucket: "ck-adm.appspot.com",
+      messagingSenderId: "192822942347",
+      appId: "1:192822942347:web:f27eee393e16c84544528e"
     };
 
-    const REFERENCE_TIME_MM = "2025-06-19T16:38:30+06:30";
-    const REFERENCE_SUFFIX = 51217;
-    
-    const baseIndexCalc = () => {
-      const refDate = new Date(REFERENCE_TIME_MM);
-      const start = new Date(refDate);
-      start.setHours(0, 0, 0, 0);
-      const refSecs = Math.floor((refDate - start) / 1000);
-      return REFERENCE_SUFFIX - Math.floor(refSecs / 30);
-    };
-    
-    const BASE_INDEX = baseIndexCalc() + 1;
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    function buildPeriod(now) {
-      const y = now.getFullYear();
-      const m = pad(now.getMonth() + 1);
-      const d = pad(now.getDate());
-      const start = new Date(now);
-      start.setHours(0, 0, 0, 0);
-      const secs = Math.floor((now - start) / 1000);
-      const pIndex = Math.floor(secs / 30);
-      const suffix = pad(BASE_INDEX + pIndex, 5);
-      const period = `${y}${m}${d}1000${suffix}`;
-      document.getElementById('period').textContent = period;
+    // Global Variables
+    let expireTime = parseInt(localStorage.getItem('expireTime')) || 0;
+    let timerInterval;
 
-      if (pIndex !== lastPeriodIndex) {
-        lastPeriodIndex = pIndex;
-        const outcome = results[pIndex % results.length];
-        const resEl = document.getElementById('result');
-        
-        // Add flip animation when result changes
-        if (lastResult && lastResult !== outcome) {
-          resEl.classList.remove('flip-in');
-          void resEl.offsetWidth; // Trigger reflow
-          resEl.classList.add('flip-in');
-        }
-        
-        lastResult = outcome;
-        resEl.textContent = outcome;
-        resEl.className = `result ${outcome.toLowerCase()} flip-in`;
+    // Login Page Functions
+    function activateKey() {
+      const key = document.getElementById('keyInput').value.trim().toUpperCase();
+      if (!key) {
+        alert("Please enter a premium access key");
+        return;
       }
+
+      // Show loading state
+      const btn = document.querySelector('.login-panel button');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> VERIFYING...';
+      btn.disabled = true;
+
+      db.ref('keys/' + key).once('value').then(snapshot => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          if (data.used) {
+            alert("This access key has already been used!");
+            return;
+          }
+          
+          const extraTime = data.duration * 60 * 1000;
+          expireTime = Math.max(Date.now(), expireTime) + extraTime;
+          localStorage.setItem('expireTime', expireTime);
+          
+          db.ref('keys/' + key).update({ used: true });
+          
+          // Show success
+          document.getElementById('content').style.display = 'block';
+          alert(`Premium Access Activated! ${data.duration} minutes added to your account`);
+          startSession();
+        } else {
+          alert("Invalid Access Key. Please check and try again.");
+        }
+      }).catch(error => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        alert("Connection error. Please check your internet and try again.");
+        console.error(error);
+      });
     }
 
-    function tick() {
-      const now = getMMTime();
-      const timeStr = now.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true
-      }).toUpperCase();
+    function startSession() {
+      if (timerInterval) clearInterval(timerInterval);
+      updateTimer();
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+      const now = Date.now();
+      const remaining = expireTime - now;
       
-      document.getElementById('clock').textContent = timeStr;
-      const secs = now.getSeconds();
-      const remain = 30 - (secs % 30);
-      
-      const timerEl = document.getElementById('timer');
-      timerEl.innerHTML = `<i class="fas fa-clock"></i> Next: 00:${pad(remain)}`;
-      
-      if (remain <= 5) {
-        timerEl.style.color = 'var(--accent)';
-        timerEl.style.fontWeight = '600';
-      } else {
-        timerEl.style.color = '';
-        timerEl.style.fontWeight = '';
+      if (remaining <= 0) {
+        clearInterval(timerInterval);
+        document.getElementById('timer').textContent = "Premium access expired";
+        document.getElementById('content').style.display = 'none';
+        localStorage.removeItem('expireTime');
+        // Auto redirect to login when premium expires
+        showLoginPage();
+        return;
       }
       
-      if (secs % 30 === 0) buildPeriod(now);
+      const hours = Math.floor(remaining / (1000 * 60 * 60));
+      const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+      
+      document.getElementById('timer').textContent = `Premium expires in: ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    function showPredictionPage() {
+      document.getElementById('loginPanel').style.display = 'none';
+      document.getElementById('predictionCard').style.display = 'block';
+      initializeAISystem();
+    }
+
+    function showLoginPage() {
+      document.getElementById('predictionCard').style.display = 'none';
+      document.getElementById('loginPanel').style.display = 'block';
     }
 
     // Initialize
-    buildPeriod(getMMTime());
-    setInterval(tick, 1000);
+    if (expireTime && Date.now() < expireTime) {
+      // If session is active, show success content
+      document.getElementById('content').style.display = 'block';
+      startSession();
+    }
+
+    // AI System Code
+    function initializeAISystem() {
+      const patternString = `BIG SMALL SMALL BIG BIG SMALL SMALL BIG BIG SMALL SMALL BIG BIG BIG SMALL SMALL BIG SMALL BIG SMALL SMALL BIG BIG SMALL BIG SMALL SMALL SMALL SMALL BIG SMALL BIG SMALL SMALL SMALL SMALL BIG SMALL BIG BIG SMALL BIG SMALL BIG BIG BIG SMALL SMALL BIG SMALL BIG SMALL SMALL BIG SMALL BIG BIG BIG BIG SMALL BIG SMALL SMALL SMALL SMALL BIG SMALL SMALL BIG SMALL SMALL SMALL BIG BIG SMALL SMALL SMALL SMALL BIG SMALL BIG SMALL BIG SMALL SMALL SMALL BIG BIG SMALL SMALL BIG SMALL BIG BIG SMALL SMALL BIG BIG SMALL BIG BIG SMALL SMALL SMALL SMALL BIG BIG SMALL BIG SMALL SMALL BIG SMALL BIG BIG BIG SMALL SMALL BIG SMALL SMALL BIG SMALL SMALL SMALL BIG SMALL SMALL BIG SMALL SMALL SMALL SMALL BIG BIG SMALL SMALL BIG BIG SMALL SMALL BIG SMALL SMALL BIG SMALL SMALL SMALL BIG BIG BIG SMALL BIG BIG SMALL SMALL SMALL SMALL BIG SMALL SMALL BIG BIG BIG SMALL SMALL SMALL BIG SMALL SMALL SMALL SMALL BIG SMALL SMALL SMALL BIG SMALL BIG BIG SMALL SMALL BIG SMALL BIG SMALL SMALL BIG BIG SMALL BIG SMALL SMALL SMALL SMALL SMALL SMALL BIG SMALL SMALL SMALL BIG SMALL SMALL BIG BIG SMALL SMALL SMALL BIG SMALL SMALL SMALL BIG BIG SMALL SMALL SMALL SMALL SMALL BIG SMALL BIG SMALL BIG SMALL BIG BIG SMALL BIG SMALL SMALL SMALL BIG SMALL SMALL SMALL SMALL SMALL BIG BIG SMALL SMALL BIG SMALL SMALL SMALL BIG SMALL SMALL BIG SMALL BIG BIG BIG SMALL SMALL BIG SMALL BIG SMALL BIG SMALL BIG SMALL SMALL SMALL SMALL BIG SMALL BIG SMALL BIG BIG SMALL SMALL BIG SMALL SMALL`;
+      const results = patternString.split(" ");
+      let lastPeriodIndex = -1;
+      let lastResult = null;
+
+      const pad = (n, w = 2) => String(n).padStart(w, '0');
+      
+      const getMMTime = () => {
+        const now = new Date();
+        const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+        return new Date(utc + 6.5 * 60 * 60 * 1000); // UTC+6:30 for Myanmar
+      };
+
+      const REFERENCE_TIME_MM = "2025-06-19T16:38:30+06:30";
+      const REFERENCE_SUFFIX = 51217;
+      
+      const baseIndexCalc = () => {
+        const refDate = new Date(REFERENCE_TIME_MM);
+        const start = new Date(refDate);
+        start.setHours(0, 0, 0, 0);
+        const refSecs = Math.floor((refDate - start) / 1000);
+        return REFERENCE_SUFFIX - Math.floor(refSecs / 30);
+      };
+      
+      const BASE_INDEX = baseIndexCalc() + 1;
+
+      function buildPeriod(now) {
+        const y = now.getFullYear();
+        const m = pad(now.getMonth() + 1);
+        const d = pad(now.getDate());
+        const start = new Date(now);
+        start.setHours(0, 0, 0, 0);
+        const secs = Math.floor((now - start) / 1000);
+        const pIndex = Math.floor(secs / 30);
+        const suffix = pad(BASE_INDEX + pIndex, 5);
+        const period = `${y}${m}${d}1000${suffix}`;
+        document.getElementById('period').textContent = period;
+
+        if (pIndex !== lastPeriodIndex) {
+          lastPeriodIndex = pIndex;
+          const outcome = results[pIndex % results.length];
+          const resEl = document.getElementById('result');
+          
+          // Add flip animation when result changes
+          if (lastResult && lastResult !== outcome) {
+            resEl.classList.remove('flip-in');
+            void resEl.offsetWidth; // Trigger reflow
+            resEl.classList.add('flip-in');
+          }
+          
+          lastResult = outcome;
+          resEl.textContent = outcome;
+          resEl.className = `result ${outcome.toLowerCase()} flip-in`;
+        }
+      }
+
+      function tick() {
+        const now = getMMTime();
+        const timeStr = now.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        }).toUpperCase();
+        
+        document.getElementById('clock').textContent = timeStr;
+        const secs = now.getSeconds();
+        const remain = 30 - (secs % 30);
+        
+        const timerEl = document.getElementById('timer');
+        timerEl.innerHTML = `<i class="fas fa-clock"></i> Next: 00:${pad(remain)}`;
+        
+        if (remain <= 5) {
+          timerEl.style.color = 'var(--accent)';
+          timerEl.style.fontWeight = '600';
+        } else {
+          timerEl.style.color = '';
+          timerEl.style.fontWeight = '';
+        }
+        
+        if (secs % 30 === 0) buildPeriod(now);
+      }
+
+      // Initialize
+      buildPeriod(getMMTime());
+      setInterval(tick, 1000);
+    }
   </script>
 </body>
 </html>
